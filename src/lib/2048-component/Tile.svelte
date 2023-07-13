@@ -3,6 +3,7 @@
     export let x;
     export let y;
     export let mergeStatus = false;
+    export let deleteStatus = false;
     import { scale } from "svelte/transition";
     let merge = false;
     function handleTransition() {
@@ -16,17 +17,19 @@
 </script>
 
 <!-- -->
-<div
-    on:transitionend={handleTransition}
-    on:animationend={handleAnimationend}
-    in:scale={{ duration: 300, start: 0.6 }}
-    class="tile"
-    class:merge
-    class:mergeStatus
-    style="--x:{x};--y:{y}"
->
-    {value}
-</div>
+{#if !deleteStatus}
+    <div
+        on:transitionend={handleTransition}
+        on:animationend={handleAnimationend}
+        in:scale={{ duration: 300, start: 0.6 }}
+        class="tile"
+        class:merge
+        class:mergeStatus
+        style="--x:{x};--y:{y}"
+    >
+        {value}
+    </div>
+{/if}
 
 <style>
     .tile {
@@ -53,7 +56,7 @@
     .merge {
         animation: merge 200ms ease;
     }
-    .mergeStatus{
+    .mergeStatus {
         z-index: 3;
     }
     @keyframes merge {

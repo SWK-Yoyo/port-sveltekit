@@ -25,25 +25,24 @@
         if (emptyCells.length === 0) return;
         let randomPosition = Math.floor(Math.random() * emptyCells.length);
         let cell = emptyCells[randomPosition];
-        cell.tile = 1;
-        return {
+        let tile = {
             x: cell.x,
             y: cell.y,
             value: value,
         };
+        cell.tile = 1;
+        return tile;
     }
 
     function newGame() {
         cells.forEach((cell) => (cell.tile = null));
         cells = cells;
-        tiles = [];
-        tiles = tiles;
         // set timeout for re-render create tile
         setTimeout(() => {
             tiles.push(genTIle());
             tiles.push(genTIle());
             tiles = tiles;
-        }, 100);
+        }, 200);
     }
 
     function moveTiles(e) {
@@ -55,151 +54,147 @@
                     setTimeout(() => {
                         tiles.push(genTIle());
                         tiles = tiles;
-                    }, 150);
+                    }, 300);
                 }
                 break;
             // move right
             case 39:
                 if (moveRight()) {
-                    tiles.push(genTIle());
-                    tiles = tiles;
+                    setTimeout(() => {
+                        tiles.push(genTIle());
+                        tiles = tiles;
+                    }, 300);
                 }
                 break;
             // move up
             case 38:
                 if (moveUp()) {
-                    tiles.push(genTIle());
-                    tiles = tiles;
+                    setTimeout(() => {
+                        tiles.push(genTIle());
+                        tiles = tiles;
+                    }, 300);
                 }
                 break;
             // move down
             case 40:
                 if (moveDown()) {
-                    tiles.push(genTIle());
-                    tiles = tiles;
+                    setTimeout(() => {
+                        tiles.push(genTIle());
+                        tiles = tiles;
+                    }, 300);
                 }
                 break;
             default:
                 break;
         }
     }
+    function prepareMoveForColumns() {
+        let prepareMove = cells.reduce((gridCell, cell) => {
+            gridCell[cell.y] = gridCell[cell.y] || [];
+            gridCell[cell.y][cell.x] = { cell: cell, tile: null };
+            return gridCell;
+        }, []);
+        tiles.forEach((tile, i) => {
+            if (tile.deleteStatus) return;
+            prepareMove[tile.y][tile.x].tile = tile;
+        });
+        return prepareMove;
+    }
+    function prepareMoveForRows() {
+        let prepareMove = cells.reduce((gridCell, cell) => {
+            gridCell[cell.x] = gridCell[cell.x] || [];
+            gridCell[cell.x][cell.y] = { cell: cell, tile: null };
+            return gridCell;
+        }, []);
+        tiles.forEach((tile, i) => {
+            if (tile.deleteStatus) return;
+            prepareMove[tile.x][tile.y].tile = tile;
+        });
+        return prepareMove;
+    }
     function moveLeft() {
         // prepare array to move
-        let prepareMove = cells.reduce((gridCell, cell) => {
-            gridCell[cell.y] = gridCell[cell.y] || [];
-            gridCell[cell.y][cell.x] = cell;
-            return gridCell;
-        }, []);
-        tiles.forEach((tile, i) => {
-            if (tile.deleteStatus) {
-                tiles.splice(i, 1);
-            } else {
-                prepareMove[tile.y][tile.x].tileEle = tile;
-            }
-        });
-        tiles = tiles;
+        let prepare = prepareMoveForColumns();
         // move array
-        return slideTiles(prepareMove);
+        return slideTiles(prepare);
     }
     function moveRight() {
-        let prepareMove = cells.reduce((gridCell, cell) => {
-            gridCell[cell.y] = gridCell[cell.y] || [];
-            gridCell[cell.y][cell.x] = cell;
-            return gridCell;
-        }, []);
-        tiles.forEach((tile, i) => {
-            if (tile.deleteStatus) {
-                tiles.splice(i, 1);
-            } else {
-                prepareMove[tile.y][tile.x].tileEle = tile;
-            }
-        });
-        prepareMove.map((val) => val.reverse());
+        let prepare = prepareMoveForColumns();
+        prepare.map((val) => val.reverse());
         // move array
-        return slideTiles(prepareMove);
+        return slideTiles(prepare);
     }
     function moveUp() {
-        let prepareMove = cells.reduce((gridCell, cell) => {
-            gridCell[cell.x] = gridCell[cell.x] || [];
-            gridCell[cell.x][cell.y] = cell;
-            return gridCell;
-        }, []);
-        tiles.forEach((tile, i) => {
-            if (tile.deleteStatus) {
-                tiles.splice(i, 1);
-            } else {
-                prepareMove[tile.x][tile.y].tileEle = tile;
-            }
-        });
+        let prepare = prepareMoveForRows();
         // move array
-        return slideTiles(prepareMove);
+        return slideTiles(prepare);
     }
     function moveDown() {
-        let prepareMove = cells.reduce((gridCell, cell) => {
-            gridCell[cell.x] = gridCell[cell.x] || [];
-            gridCell[cell.x][cell.y] = cell;
-            return gridCell;
-        }, []);
-        tiles.forEach((tile, i) => {
-            if (tile.deleteStatus) {
-                tiles.splice(i, 1);
-            } else {
-                prepareMove[tile.x][tile.y].tileEle = tile;
-            }
-        });
-        prepareMove.map((val) => val.reverse());
+        let prepare = prepareMoveForRows();
+        prepare.map((val) => val.reverse());
         // move array
-        return slideTiles(prepareMove);
+        return slideTiles(prepare);
     }
 
-    function slideTiles(cells2) {
-        console.log(cells2);
+    function slideTiles(prepareCellsAndTiles) {
         let moveStatus = false;
-        for (let i = 0; i < Object.keys(cells2).length; i++) {
+        for (let i = 0; i < Object.keys(prepareCellsAndTiles).length; i++) {
             let prev = 0;
             let mergeStatus = false;
-            for (let j = 1; j < Object.keys(cells2[i]).length; j++) {
-                let cell = cells2[i][j];
-                let prevCell = cells2[i][prev];
-                if (cell.tile === null) continue;
-                let tile = cell.tileEle;
-                let prevTile = prevCell.tileEle;
-                if (prevCell?.tile) {
+            for (
+                let j = 1;
+                j < Object.keys(prepareCellsAndTiles[i]).length;
+                j++
+            ) {
+                let prepare = prepareCellsAndTiles[i][j];
+                let prevPrepare = prepareCellsAndTiles[i][prev];
+                if (prepare.tile === null) continue;
+                if (prevPrepare?.tile) {
                     // merge tile if tile value = prevTile value
                     if (
-                        cell.tile.value === prevCell.tile?.value &&
+                        prepare.tile.value === prevPrepare.tile?.value &&
                         !mergeStatus
                     ) {
-                        // set tile
-                        tile.x = prevTile.x;
-                        tile.y = prevTile.y;
-                        tile.value *= 2;
-                        tile.mergeStatus = true;
-                        prevTile.deleteStatus = true;
-                        // set cell
-                        prevCell.tile = 1;
-                        cell.tile = null;
+                        // set move status
                         moveStatus = true;
                         mergeStatus = true;
+                        // set tile
+                        prepare.tile.x = prevPrepare.tile.x;
+                        prepare.tile.y = prevPrepare.tile.y;
+                        prepare.tile.value *= 2;
+                        prepare.tile.mergeStatus = true;
+                        prevPrepare.tile.deleteStatus = true;
+                        // set cell
+                        prevPrepare.cell = 1;
+                        prepare.cell = null;
                     } else {
                         prev++;
-                        prevCell = cells2[i][prev];
+                        prevPrepare = prepareCellsAndTiles[i][prev];
                         // check tile !== prevTile for move if move status merge is reset
-                        if (tile.x !== prevCell.x || tile.y !== prevCell.y) {
+                        if (
+                            prepare.tile.x !== prevPrepare.cell.x ||
+                            prepare.tile.y !== prevPrepare.cell.y
+                        ) {
+                            // set move merge status
                             mergeStatus = false;
                             moveStatus = true;
-                            tile.x = prevCell.x;
-                            tile.y = prevCell.y;
-                            prevCell.tile = 1;
-                            cell.tile = null;
+                            // set tile
+                            prepare.tile.x = prevPrepare.cell.x;
+                            prepare.tile.y = prevPrepare.cell.y;
+                            // set cell value
+                            prevPrepare.cell.tile = 1;
+                            prepare.cell.tile = null;
                         }
                     }
                 } else {
-                    tile.x = prevCell.x;
-                    tile.y = prevCell.y;
-                    prevCell.tile = 1;
-                    cell.tile = null;
+                    // set move status
                     moveStatus = true;
+                    // set tile
+                    prepare.tile.x = prevPrepare.cell.x;
+                    prepare.tile.y = prevPrepare.cell.y;
+                    // set cell value
+                    prevPrepare.cell.tile = 1;
+                    prepare.cell.tile = null;
                 }
             }
         }
