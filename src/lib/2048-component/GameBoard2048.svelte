@@ -3,11 +3,12 @@
     import Cell from "$lib/2048-component/Cell.svelte";
     import { onMount } from "svelte";
     import { escape } from "svelte/internal";
-
+    let myWindow;
     export let boardSize = 4;
     onMount(() => {
         newGame();
     });
+    let id = 1;
     let cells = [];
     let tiles = [];
     // initial setup
@@ -26,6 +27,22 @@
         let randomPosition = Math.floor(Math.random() * emptyCells.length);
         let cell = emptyCells[randomPosition];
         let tile = {
+            id: id++,
+            x: cell.x,
+            y: cell.y,
+            value: value,
+        };
+        cell.tile = 1;
+        return tile;
+    }
+
+    function genTIleForDebug(po, value = Math.random() > 0.5 ? 2 : 4) {
+        let emptyCells = cells.filter((val) => val.tile === null);
+        if (emptyCells.length === 0) return;
+        let randomPosition = po;
+        let cell = emptyCells[randomPosition];
+        let tile = {
+            id: id++,
             x: cell.x,
             y: cell.y,
             value: value,
@@ -36,13 +53,12 @@
 
     function newGame() {
         cells.forEach((cell) => (cell.tile = null));
+        tiles = []
         cells = cells;
         // set timeout for re-render create tile
-        setTimeout(() => {
-            tiles.push(genTIle());
-            tiles.push(genTIle());
-            tiles = tiles;
-        }, 200);
+        tiles.push(genTIle());
+        tiles.push(genTIle());
+        tiles = tiles;
     }
 
     function moveTiles(e) {
@@ -54,7 +70,11 @@
                     setTimeout(() => {
                         tiles.push(genTIle());
                         tiles = tiles;
-                    }, 300);
+                        e.target.addEventListener("keyup", moveTiles, {
+                            once: true,
+                        });
+                    }, 100);
+                    return;
                 }
                 break;
             // move right
@@ -63,7 +83,11 @@
                     setTimeout(() => {
                         tiles.push(genTIle());
                         tiles = tiles;
-                    }, 300);
+                        e.target.addEventListener("keyup", moveTiles, {
+                            once: true,
+                        });
+                    }, 100);
+                    return;
                 }
                 break;
             // move up
@@ -72,7 +96,11 @@
                     setTimeout(() => {
                         tiles.push(genTIle());
                         tiles = tiles;
-                    }, 300);
+                        e.target.addEventListener("keyup", moveTiles, {
+                            once: true,
+                        });
+                    }, 100);
+                    return;
                 }
                 break;
             // move down
@@ -81,13 +109,21 @@
                     setTimeout(() => {
                         tiles.push(genTIle());
                         tiles = tiles;
-                    }, 300);
+                        e.target.addEventListener("keyup", moveTiles, {
+                            once: true,
+                        });
+                    }, 100);
+                    return;
                 }
                 break;
             default:
                 break;
         }
+        e.target.addEventListener("keyup", moveTiles, {
+            once: true,
+        });
     }
+
     function prepareMoveForColumns() {
         let prepareMove = cells.reduce((gridCell, cell) => {
             gridCell[cell.y] = gridCell[cell.y] || [];
@@ -95,7 +131,6 @@
             return gridCell;
         }, []);
         tiles.forEach((tile, i) => {
-            if (tile.deleteStatus) return;
             prepareMove[tile.y][tile.x].tile = tile;
         });
         return prepareMove;
@@ -107,7 +142,6 @@
             return gridCell;
         }, []);
         tiles.forEach((tile, i) => {
-            if (tile.deleteStatus) return;
             prepareMove[tile.x][tile.y].tile = tile;
         });
         return prepareMove;
@@ -136,65 +170,67 @@
         return slideTiles(prepare);
     }
 
-    function slideTiles(prepareCellsAndTiles) {
+    function slideTiles(arr) {
         let moveStatus = false;
-        for (let i = 0; i < Object.keys(prepareCellsAndTiles).length; i++) {
+        for (let i = 0; i < Object.keys(arr).length; i++) {
             let prev = 0;
             let mergeStatus = false;
-            for (
-                let j = 1;
-                j < Object.keys(prepareCellsAndTiles[i]).length;
-                j++
-            ) {
-                let prepare = prepareCellsAndTiles[i][j];
-                let prevPrepare = prepareCellsAndTiles[i][prev];
-                if (prepare.tile === null) continue;
-                if (prevPrepare?.tile) {
+            for (let j = 1; j < Object.keys(arr[i]).length; j++) {
+                let tile = arr[i][j].tile;
+                let prevTile = arr[i][prev].tile;
+                let cell = arr[i][j].cell;
+                let prevCell = arr[i][prev].cell;
+
+                if (tile === null) continue;
+                if (prevTile !== null) {
                     // merge tile if tile value = prevTile value
-                    if (
-                        prepare.tile.value === prevPrepare.tile?.value &&
-                        !mergeStatus
-                    ) {
+                    if (tile.value === prevTile?.value && !mergeStatus) {
                         // set move status
                         moveStatus = true;
                         mergeStatus = true;
                         // set tile
-                        prepare.tile.x = prevPrepare.tile.x;
-                        prepare.tile.y = prevPrepare.tile.y;
-                        prepare.tile.value *= 2;
-                        prepare.tile.mergeStatus = true;
-                        prevPrepare.tile.deleteStatus = true;
+                        tile.x = prevTile.x;
+                        tile.y = prevTile.y;
+                        tile.mergeStatus = true;
+                        tile.value *= 2;
+                        arr[i][prev].tile = { ...tile };
+                        arr[i][j].tile = null;
+                        setTimeout(() => {
+                            tile.mergeStatus = false;
+                            removeTileById(prevTile.id);
+                        }, 200);
                         // set cell
-                        prevPrepare.cell = 1;
-                        prepare.cell = null;
+                        prevCell = 1;
+                        cell = null;
                     } else {
                         prev++;
-                        prevPrepare = prepareCellsAndTiles[i][prev];
+                        prevCell = arr[i][prev].cell;
                         // check tile !== prevTile for move if move status merge is reset
-                        if (
-                            prepare.tile.x !== prevPrepare.cell.x ||
-                            prepare.tile.y !== prevPrepare.cell.y
-                        ) {
+                        if (tile.x !== prevCell.x || tile.y !== prevCell.y) {
                             // set move merge status
                             mergeStatus = false;
                             moveStatus = true;
                             // set tile
-                            prepare.tile.x = prevPrepare.cell.x;
-                            prepare.tile.y = prevPrepare.cell.y;
+                            tile.x = prevCell.x;
+                            tile.y = prevCell.y;
+                            arr[i][prev].tile = { ...tile };
+                            arr[i][j].tile = null;
                             // set cell value
-                            prevPrepare.cell.tile = 1;
-                            prepare.cell.tile = null;
+                            prevCell.tile = 1;
+                            cell.tile = null;
                         }
                     }
                 } else {
                     // set move status
                     moveStatus = true;
                     // set tile
-                    prepare.tile.x = prevPrepare.cell.x;
-                    prepare.tile.y = prevPrepare.cell.y;
+                    tile.x = prevCell.x;
+                    tile.y = prevCell.y;
+                    arr[i][prev].tile = { ...tile };
+                    arr[i][j].tile = null;
                     // set cell value
-                    prevPrepare.cell.tile = 1;
-                    prepare.cell.tile = null;
+                    prevCell.tile = 1;
+                    cell.tile = null;
                 }
             }
         }
@@ -202,9 +238,16 @@
         tiles = tiles;
         return moveStatus;
     }
+    function removeTileById(id) {
+        tiles.forEach((tile, i) => {
+            if (tile.id === id) {
+                tiles.splice(i, 1);
+            }
+        });
+    }
 </script>
 
-<svelte:window on:keyup={moveTiles} />
+<svelte:window on:keyup|once={moveTiles} />
 <section>
     <button on:click={newGame}>new game</button>
     <div
@@ -214,7 +257,7 @@
         {#each cells as cell, i (Symbol())}
             <Cell />
         {/each}
-        {#each tiles as tile}
+        {#each tiles as tile (tile.id)}
             <Tile {...tile} />
         {/each}
     </div>

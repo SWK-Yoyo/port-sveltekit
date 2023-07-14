@@ -51,10 +51,10 @@
         );
         width: calc((100% / var(--boardSize)) - (var(--gap) + 0.25rem));
         height: calc((100% / var(--boardSize)) - (var(--gap) + 0.25rem));
-        transition: all 300ms;
+        transition: all 200ms;
     }
     .merge {
-        animation: merge 200ms ease;
+        animation: merge 100ms ease;
     }
     .mergeStatus {
         z-index: 3;
