@@ -53,11 +53,13 @@
 
     function newGame() {
         cells.forEach((cell) => (cell.tile = null));
-        tiles = []
+        tiles = [];
         cells = cells;
         // set timeout for re-render create tile
-        tiles.push(genTIle());
-        tiles.push(genTIle());
+        tiles.push(genTIleForDebug(0, 4));
+        tiles.push(genTIleForDebug(3, 4));
+        tiles.push(genTIleForDebug(6, 8));
+        tiles.push(genTIleForDebug(9, 16));
         tiles = tiles;
     }
 
@@ -86,7 +88,7 @@
                         e.target.addEventListener("keyup", moveTiles, {
                             once: true,
                         });
-                    }, 100);
+                    }, 200);
                     return;
                 }
                 break;
@@ -99,7 +101,7 @@
                         e.target.addEventListener("keyup", moveTiles, {
                             once: true,
                         });
-                    }, 100);
+                    }, 200);
                     return;
                 }
                 break;
@@ -112,7 +114,7 @@
                         e.target.addEventListener("keyup", moveTiles, {
                             once: true,
                         });
-                    }, 100);
+                    }, 200);
                     return;
                 }
                 break;
