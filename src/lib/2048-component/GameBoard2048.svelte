@@ -3,25 +3,34 @@
     import Cell from "$lib/2048-component/Cell.svelte";
     import { onMount } from "svelte";
     import { escape } from "svelte/internal";
+
     let myWindow;
     export let boardSize = 4;
-    onMount(() => {
-        newGame();
-    });
-    let id = 1;
-    let cells = [];
-    let tiles = [];
     // initial setup
-    for (let i = 0; i < boardSize * boardSize; i++) {
-        cells.push({
-            x: Math.floor(i / boardSize),
-            y: i % boardSize,
-            tile: null,
-        });
-        cells = cells;
-    }
+    let id = 0;
+    let cells = [];
+    let tiles = {};
+    onMount(() => {
+        if (localStorage.cells) {
+            id = localStorage.id;
+            cells = JSON.parse(localStorage.cells);
+            tiles = JSON.parse(localStorage.tiles);
+        } else {
+            // initial setup
+            for (let i = 0; i < boardSize * boardSize; i++) {
+                cells.push({
+                    x: Math.floor(i / boardSize),
+                    y: i % boardSize,
+                    tile: null,
+                });
+                cells = cells;
+            }
+            newGame();
+        }
+    });
 
-    function genTIle(value = Math.random() > 0.5 ? 2 : 4) {
+    function genTile(value = Math.random() > 0.5 ? 2 : 4) {
+        checkGameOver();
         let emptyCells = cells.filter((val) => val.tile === null);
         if (emptyCells.length === 0) return;
         let randomPosition = Math.floor(Math.random() * emptyCells.length);
@@ -36,7 +45,7 @@
         return tile;
     }
 
-    function genTIleForDebug(po, value = Math.random() > 0.5 ? 2 : 4) {
+    function genTileForDebug(po, value = Math.random() > 0.5 ? 2 : 4) {
         let emptyCells = cells.filter((val) => val.tile === null);
         if (emptyCells.length === 0) return;
         let randomPosition = po;
@@ -52,15 +61,17 @@
     }
 
     function newGame() {
+        id = 0;
         cells.forEach((cell) => (cell.tile = null));
-        tiles = [];
+        tiles = {};
         cells = cells;
         // set timeout for re-render create tile
-        tiles.push(genTIleForDebug(0, 4));
-        tiles.push(genTIleForDebug(3, 4));
-        tiles.push(genTIleForDebug(6, 8));
-        tiles.push(genTIleForDebug(9, 16));
+        tiles[id] = genTile();
+        tiles[id] = genTile();
         tiles = tiles;
+        localStorage.setItem("id", id);
+        localStorage.setItem("cells", JSON.stringify(cells));
+        localStorage.setItem("tiles", JSON.stringify(tiles));
     }
 
     function moveTiles(e) {
@@ -69,61 +80,46 @@
             // move left
             case 37:
                 if (moveLeft()) {
-                    setTimeout(() => {
-                        tiles.push(genTIle());
-                        tiles = tiles;
-                        e.target.addEventListener("keyup", moveTiles, {
-                            once: true,
-                        });
-                    }, 100);
-                    return;
+                    moveSuccess();
                 }
                 break;
             // move right
             case 39:
                 if (moveRight()) {
-                    setTimeout(() => {
-                        tiles.push(genTIle());
-                        tiles = tiles;
-                        e.target.addEventListener("keyup", moveTiles, {
-                            once: true,
-                        });
-                    }, 200);
-                    return;
+                    moveSuccess();
                 }
                 break;
             // move up
             case 38:
                 if (moveUp()) {
-                    setTimeout(() => {
-                        tiles.push(genTIle());
-                        tiles = tiles;
-                        e.target.addEventListener("keyup", moveTiles, {
-                            once: true,
-                        });
-                    }, 200);
-                    return;
+                    moveSuccess();
                 }
                 break;
             // move down
             case 40:
                 if (moveDown()) {
-                    setTimeout(() => {
-                        tiles.push(genTIle());
-                        tiles = tiles;
-                        e.target.addEventListener("keyup", moveTiles, {
-                            once: true,
-                        });
-                    }, 200);
-                    return;
+                    moveSuccess();
                 }
                 break;
             default:
+                e.target.addEventListener("keyup", moveTiles, {
+                    once: true,
+                });
+                return;
                 break;
         }
         e.target.addEventListener("keyup", moveTiles, {
             once: true,
         });
+
+        function moveSuccess() {
+            tiles[id] = genTile();
+            tiles = tiles;
+            cells = cells;
+            localStorage.setItem("id", id);
+            localStorage.setItem("cells", JSON.stringify(cells));
+            localStorage.setItem("tiles", JSON.stringify(tiles));
+        }
     }
 
     function prepareMoveForColumns() {
@@ -132,7 +128,7 @@
             gridCell[cell.y][cell.x] = { cell: cell, tile: null };
             return gridCell;
         }, []);
-        tiles.forEach((tile, i) => {
+        Object.values(tiles).forEach((tile, i) => {
             prepareMove[tile.y][tile.x].tile = tile;
         });
         return prepareMove;
@@ -143,7 +139,7 @@
             gridCell[cell.x][cell.y] = { cell: cell, tile: null };
             return gridCell;
         }, []);
-        tiles.forEach((tile, i) => {
+        Object.values(tiles).forEach((tile, i) => {
             prepareMove[tile.x][tile.y].tile = tile;
         });
         return prepareMove;
@@ -151,6 +147,7 @@
     function moveLeft() {
         // prepare array to move
         let prepare = prepareMoveForColumns();
+        console.log(tiles);
         // move array
         return slideTiles(prepare);
     }
@@ -194,16 +191,13 @@
                         tile.x = prevTile.x;
                         tile.y = prevTile.y;
                         tile.mergeStatus = true;
+                        tile.prevId = prevTile.id;
                         tile.value *= 2;
                         arr[i][prev].tile = { ...tile };
                         arr[i][j].tile = null;
-                        setTimeout(() => {
-                            tile.mergeStatus = false;
-                            removeTileById(prevTile.id);
-                        }, 200);
                         // set cell
-                        prevCell = 1;
-                        cell = null;
+                        prevCell.tile = 1;
+                        cell.tile = null;
                     } else {
                         prev++;
                         prevCell = arr[i][prev].cell;
@@ -240,12 +234,87 @@
         tiles = tiles;
         return moveStatus;
     }
-    function removeTileById(id) {
-        tiles.forEach((tile, i) => {
-            if (tile.id === id) {
-                tiles.splice(i, 1);
+
+    function checkSlide(arr) {
+        let moveStatus = false;
+        for (let i = 0; i < Object.keys(arr).length; i++) {
+            let prev = 0;
+            let mergeStatus = false;
+            for (let j = 1; j < Object.keys(arr[i]).length; j++) {
+                let tile = arr[i][j].tile;
+                let prevTile = arr[i][prev].tile;
+                let prevCell = arr[i][prev].cell;
+                if (tile === null) continue;
+                if (prevTile !== null) {
+                    if (tile.value === prevTile?.value && !mergeStatus) {
+                        moveStatus = true;
+                        mergeStatus = true;
+                    } else {
+                        prev++;
+                        prevCell = arr[i][prev].cell;
+                        if (tile.x !== prevCell.x || tile.y !== prevCell.y) {
+                            mergeStatus = false;
+                            moveStatus = true;
+                        }
+                    }
+                } else {
+                    moveStatus = true;
+                }
             }
-        });
+        }
+        cells = cells;
+        tiles = tiles;
+        return moveStatus;
+    }
+
+    function checkGameOver() {
+        if (
+            Object.values(tiles).length > 15 &&
+            !checkMoveLeft() &&
+            !checkMoveRight &&
+            !checkMoveUp() &&
+            !checkMoveDown()
+        ) {
+            alert("game over");
+            localStorage.removeItem("id", id);
+            localStorage.removeItem("cells", JSON.stringify(cells));
+            localStorage.removeItem("tiles", JSON.stringify(tiles));
+        }
+        function checkMoveLeft() {
+            let prepare = prepareMoveForColumns();
+            return checkSlide(prepare);
+        }
+        function checkMoveRight() {
+            let prepare = prepareMoveForColumns();
+            prepare.map((val) => val.reverse());
+            return checkSlide(prepare);
+        }
+        function checkMoveUp() {
+            let prepare = prepareMoveForRows();
+            return checkSlide(prepare);
+        }
+        function checkMoveDown() {
+            let prepare = prepareMoveForRows();
+            prepare.map((val) => val.reverse());
+            return checkSlide(prepare);
+        }
+    }
+    function handleTransitionEnd(tile) {
+        console.log("transition end");
+        if (tile.mergeStatus) {
+            tile.merge = true;
+            tile.mergeStatus = false;
+            delete tiles[tile.prevId];
+            delete tile.prevId;
+        } else {
+            tile.merge = false;
+        }
+        tiles = tiles;
+    }
+    function handleAnimationEnd(tile) {
+        if (tile.merge) {
+            tile.merge = false;
+        }
     }
 </script>
 
@@ -256,11 +325,19 @@
         class="game-board"
         style="--boardSize:{boardSize};--gap: 1rem;--padding: 1rem;"
     >
-        {#each cells as cell, i (Symbol())}
+        {#each cells as cell (Symbol())}
             <Cell />
         {/each}
-        {#each tiles as tile (tile.id)}
-            <Tile {...tile} />
+        {#each Object.values(tiles) as tile (tile.id)}
+            <Tile
+                id={tile.id}
+                x={tile.x}
+                y={tile.y}
+                value={tile.value}
+                merge={tile.merge}
+                on:transitionend={() => handleTransitionEnd(tile)}
+                on:animationend={() => handleAnimationEnd(tile)}
+            />
         {/each}
     </div>
 </section>
