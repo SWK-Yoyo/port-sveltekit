@@ -30,7 +30,6 @@
     });
 
     function genTile(value = Math.random() > 0.5 ? 2 : 4) {
-        checkGameOver();
         let emptyCells = cells.filter((val) => val.tile === null);
         if (emptyCells.length === 0) return;
         let randomPosition = Math.floor(Math.random() * emptyCells.length);
@@ -113,12 +112,14 @@
         });
 
         function moveSuccess() {
+            console.log("moveSuccess");
             tiles[id] = genTile();
             tiles = tiles;
             cells = cells;
             localStorage.setItem("id", id);
             localStorage.setItem("cells", JSON.stringify(cells));
             localStorage.setItem("tiles", JSON.stringify(tiles));
+            checkGameOver();
         }
     }
 
@@ -147,7 +148,6 @@
     function moveLeft() {
         // prepare array to move
         let prepare = prepareMoveForColumns();
-        console.log(tiles);
         // move array
         return slideTiles(prepare);
     }
@@ -262,16 +262,14 @@
                 }
             }
         }
-        cells = cells;
-        tiles = tiles;
         return moveStatus;
     }
 
     function checkGameOver() {
         if (
-            Object.values(tiles).length > 15 &&
+            Object.values(tiles).length > 14 &&
             !checkMoveLeft() &&
-            !checkMoveRight &&
+            !checkMoveRight() &&
             !checkMoveUp() &&
             !checkMoveDown()
         ) {
@@ -310,10 +308,13 @@
             tile.merge = false;
         }
         tiles = tiles;
+        localStorage.setItem("tiles", JSON.stringify(tiles));
     }
     function handleAnimationEnd(tile) {
         if (tile.merge) {
             tile.merge = false;
+            tiles = tiles;
+            localStorage.setItem("tiles", JSON.stringify(tiles));
         }
     }
 </script>
