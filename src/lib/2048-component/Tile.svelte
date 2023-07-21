@@ -4,8 +4,9 @@
     export let y;
     export let merge = false;
     import { scale } from "svelte/transition";
-    let background = [];
-    let color = [];
+    let backgroundClass = ["red-100", "red-200"];
+    let bgColor = "";
+    $: bgColor = backgroundClass[Math.log2(value) - 1];
 </script>
 
 <!-- -->
@@ -13,7 +14,7 @@
     on:transitionend
     on:animationend
     in:scale={{ duration: 300, start: 0.6 }}
-    class="tile"
+    class="tile {bgColor}"
     class:merge
     style="--x:{x};--y:{y}"
 >
@@ -21,6 +22,12 @@
 </div>
 
 <style>
+    .red-100 {
+        background-color: hsl(194, 100%, 86%);
+    }
+    .red-200 {
+        background-color: hsl(0, 100%, 77%);
+    }
     .tile {
         position: absolute;
         display: flex;
@@ -28,8 +35,9 @@
         align-items: center;
         width: 50px;
         height: 50px;
-        background-color: red;
         border-radius: 0.5rem;
+        font-weight: bold;
+        font-size: 5vw;
         top: calc(
             var(--y) * (100% / var(--boardSize) - (var(--gap) * 0.25)) +
                 var(--gap)

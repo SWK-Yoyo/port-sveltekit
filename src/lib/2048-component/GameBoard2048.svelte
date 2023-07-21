@@ -39,6 +39,7 @@
             x: cell.x,
             y: cell.y,
             value: value,
+            new: true,
         };
         cell.tile = 1;
         return tile;
@@ -80,24 +81,40 @@
             case 37:
                 if (moveLeft()) {
                     moveSuccess();
+                } else {
+                    e.target.addEventListener("keyup", moveTiles, {
+                        once: true,
+                    });
                 }
                 break;
             // move right
             case 39:
                 if (moveRight()) {
                     moveSuccess();
+                } else {
+                    e.target.addEventListener("keyup", moveTiles, {
+                        once: true,
+                    });
                 }
                 break;
             // move up
             case 38:
                 if (moveUp()) {
                     moveSuccess();
+                } else {
+                    e.target.addEventListener("keyup", moveTiles, {
+                        once: true,
+                    });
                 }
                 break;
             // move down
             case 40:
                 if (moveDown()) {
                     moveSuccess();
+                } else {
+                    e.target.addEventListener("keyup", moveTiles, {
+                        once: true,
+                    });
                 }
                 break;
             default:
@@ -107,9 +124,6 @@
                 return;
                 break;
         }
-        e.target.addEventListener("keyup", moveTiles, {
-            once: true,
-        });
 
         function moveSuccess() {
             console.log("moveSuccess");
@@ -119,7 +133,9 @@
             localStorage.setItem("id", id);
             localStorage.setItem("cells", JSON.stringify(cells));
             localStorage.setItem("tiles", JSON.stringify(tiles));
-            checkGameOver();
+            e.target.addEventListener("keyup", moveTiles, {
+                once: true,
+            });
         }
     }
 
@@ -130,6 +146,7 @@
             return gridCell;
         }, []);
         Object.values(tiles).forEach((tile, i) => {
+            delete tile.new;
             prepareMove[tile.y][tile.x].tile = tile;
         });
         return prepareMove;
@@ -141,6 +158,7 @@
             return gridCell;
         }, []);
         Object.values(tiles).forEach((tile, i) => {
+            delete tile.new;
             prepareMove[tile.x][tile.y].tile = tile;
         });
         return prepareMove;
@@ -315,6 +333,10 @@
             tile.merge = false;
             tiles = tiles;
             localStorage.setItem("tiles", JSON.stringify(tiles));
+        }
+        if (tile.new) {
+            console.log('check my game over !!!')
+            checkGameOver();
         }
     }
 </script>
