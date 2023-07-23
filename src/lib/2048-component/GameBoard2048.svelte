@@ -5,6 +5,8 @@
     import { escape } from "svelte/internal";
 
     let myWindow;
+    let keyBoardStatus = false;
+    let gameOver = false;
     export let boardSize = 4;
     // initial setup
     let id = 0;
@@ -75,12 +77,16 @@
     }
 
     function moveTiles(e) {
+        if (!myWindow) {
+            myWindow = e.target;
+        }
+
         console.log(e.keyCode);
         switch (e.keyCode) {
             // move left
             case 37:
                 if (moveLeft()) {
-                    moveSuccess();
+                    keyBoardStatus = false;
                 } else {
                     e.target.addEventListener("keyup", moveTiles, {
                         once: true,
@@ -90,7 +96,7 @@
             // move right
             case 39:
                 if (moveRight()) {
-                    moveSuccess();
+                    keyBoardStatus = false;
                 } else {
                     e.target.addEventListener("keyup", moveTiles, {
                         once: true,
@@ -100,7 +106,7 @@
             // move up
             case 38:
                 if (moveUp()) {
-                    moveSuccess();
+                    keyBoardStatus = false;
                 } else {
                     e.target.addEventListener("keyup", moveTiles, {
                         once: true,
@@ -110,7 +116,7 @@
             // move down
             case 40:
                 if (moveDown()) {
-                    moveSuccess();
+                    keyBoardStatus = false;
                 } else {
                     e.target.addEventListener("keyup", moveTiles, {
                         once: true,
@@ -124,19 +130,19 @@
                 return;
                 break;
         }
+    }
 
-        function moveSuccess() {
-            console.log("moveSuccess");
-            tiles[id] = genTile();
-            tiles = tiles;
-            cells = cells;
-            localStorage.setItem("id", id);
-            localStorage.setItem("cells", JSON.stringify(cells));
-            localStorage.setItem("tiles", JSON.stringify(tiles));
-            e.target.addEventListener("keyup", moveTiles, {
-                once: true,
-            });
-        }
+    function moveSuccess() {
+        console.log("moveSuccess");
+        tiles[id] = genTile();
+        tiles = tiles;
+        cells = cells;
+        localStorage.setItem("id", id);
+        localStorage.setItem("cells", JSON.stringify(cells));
+        localStorage.setItem("tiles", JSON.stringify(tiles));
+        myWindow.addEventListener("keyup", moveTiles, {
+            once: true,
+        });
     }
 
     function prepareMoveForColumns() {
@@ -146,7 +152,6 @@
             return gridCell;
         }, []);
         Object.values(tiles).forEach((tile, i) => {
-            delete tile.new;
             prepareMove[tile.y][tile.x].tile = tile;
         });
         return prepareMove;
@@ -158,7 +163,6 @@
             return gridCell;
         }, []);
         Object.values(tiles).forEach((tile, i) => {
-            delete tile.new;
             prepareMove[tile.x][tile.y].tile = tile;
         });
         return prepareMove;
@@ -291,6 +295,7 @@
             !checkMoveUp() &&
             !checkMoveDown()
         ) {
+            gameOver = true;
             alert("game over");
             localStorage.removeItem("id", id);
             localStorage.removeItem("cells", JSON.stringify(cells));
@@ -319,31 +324,45 @@
         console.log("transition end");
         if (tile.mergeStatus) {
             tile.merge = true;
+            console.log(tile);
             tile.mergeStatus = false;
             delete tiles[tile.prevId];
             delete tile.prevId;
         } else {
             tile.merge = false;
         }
+
+        if (!keyBoardStatus) {
+            // add keyup after transition
+            moveSuccess();
+            keyBoardStatus = true;
+        }
         tiles = tiles;
         localStorage.setItem("tiles", JSON.stringify(tiles));
     }
     function handleAnimationEnd(tile) {
+        console.log("animation end");
         if (tile.merge) {
+            console.log("merge end");
+            console.log(tile);
             tile.merge = false;
             tiles = tiles;
             localStorage.setItem("tiles", JSON.stringify(tiles));
         }
         if (tile.new) {
-            console.log('check my game over !!!')
+            console.log("check my game over !!!");
             checkGameOver();
+            delete tile.new;
+            tiles = tiles;
         }
     }
 </script>
 
 <svelte:window on:keyup|once={moveTiles} />
 <section>
-    <button on:click={newGame}>new game</button>
+    <div class="text-right">
+        <button on:click={newGame}>new game</button>
+    </div>
     <div
         class="game-board"
         style="--boardSize:{boardSize};--gap: 1rem;--padding: 1rem;"
@@ -362,22 +381,25 @@
                 on:animationend={() => handleAnimationEnd(tile)}
             />
         {/each}
+        <div class="game-over" style="display:{gameOver ? 'flex' : 'none'};">
+            <p>Game Over</p>
+            <button on:click={newGame}>new game</button>
+        </div>
     </div>
 </section>
 
 <style>
-    section {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        height: 100vh;
-        height: 100svh;
-        background-color: rgb(84, 84, 84);
+    button {
+        margin-bottom: 1rem;
+    }
+    .text-right {
+        text-align: right;
     }
     .game-board {
-        width: 500px;
-        height: 500px;
+        width: 60vw;
+        height: 60vw;
+        max-width: 500px;
+        max-height: 500px;
         background-color: rgb(255, 161, 161);
         border-radius: 1rem;
         display: grid;
@@ -386,5 +408,19 @@
         padding: var(--padding);
         gap: var(--gap);
         position: relative;
+    }
+    .game-over {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 1rem;
+        font-size: 5vw;
+        color: white;
+        opacity: 1;
+        transition: all 1s;
     }
 </style>

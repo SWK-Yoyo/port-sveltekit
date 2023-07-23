@@ -2,5 +2,13 @@
     import GameBoard2048 from "$lib/2048-component/GameBoard2048.svelte";
 </script>
 
+<div>
+    <GameBoard2048 />
+</div>
 
-<GameBoard2048></GameBoard2048>
+<style>
+    div {
+        display: flex;
+        justify-content: center;
+    }
+</style>

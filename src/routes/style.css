@@ -1,5 +1,26 @@
-*, *::before, *::after {
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap');
+
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    height: 100svh;
+    background-color: rgb(84, 84, 84);
+    font-family: "Rubik", sans-serif;
+}
+
+button {
+    min-width: 80px;
+    padding: .5rem .8rem;
+    border-radius: .3rem;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    font-family: "Rubik", sans-serif;
 }
