@@ -3,6 +3,7 @@
     export let x;
     export let y;
     export let merge = false;
+    export let mergeStatus = false;
     import { scale } from "svelte/transition";
     let backgroundClass = [
         "tile-2",
@@ -28,7 +29,8 @@
     on:animationend
     in:scale={{ duration: 300, start: 0.6 }}
     class:merge
-    class="tile {bgColor ? bgColor : ''} "
+    class:mergeStatus
+    class="tile {bgColor} "
     style="--x:{x};--y:{y}"
 >
     {value}
@@ -97,7 +99,7 @@
         width: 50px;
         height: 50px;
         border-radius: 0.5rem;
-        font-size: 4vw;
+        font-size: clamp(1rem , 4vw , 3rem);
         top: calc(
             var(--y) * (100% / var(--boardSize) - (var(--gap) * 0.25)) +
                 var(--gap)
@@ -109,14 +111,22 @@
         width: calc((100% / var(--boardSize)) - (var(--gap) + 0.25rem));
         height: calc((100% / var(--boardSize)) - (var(--gap) + 0.25rem));
         transition: all 100ms;
+        z-index: 2;
     }
     .merge {
         z-index: 3;
-        animation: merge 50ms ease-in-out;
+        animation: merge 100ms ease-in-out;
+    }
+    .mergeStatus {
+        z-index: 3;
     }
     @keyframes merge {
+        0%{
+            
+            transform: scale(.95);
+        }
         50% {
-            transform: scale(1.5);
+            transform: scale(1.1);
         }
     }
 </style>

@@ -9,5 +9,7 @@
         width: 100%;
         height: 100%;
         border-radius: 0.5rem;
+        position: inherit;
+        z-index: 1
     }
 </style>

@@ -1,22 +1,31 @@
 <script>
     import Tile from "$lib/2048-component/Tile.svelte";
     import Cell from "$lib/2048-component/Cell.svelte";
+    import Score from "$lib/2048-component/Score.svelte";
     import { onMount } from "svelte";
     import { escape } from "svelte/internal";
 
     let myWindow;
-    let keyBoardStatus = false;
+    let keyBoardStatus = true;
     let gameOver = false;
     export let boardSize = 4;
     // initial setup
+    let newGameBtn1;
+    let newGameBtn2;
     let id = 0;
     let cells = [];
     let tiles = {};
+    let score = 0;
+    let highScore = 0;
+    let plusScore = 0;
     onMount(() => {
+        myWindow = window;
         if (localStorage.cells) {
             id = localStorage.id;
             cells = JSON.parse(localStorage.cells);
             tiles = JSON.parse(localStorage.tiles);
+            score = localStorage.score || 0;
+            highScore = localStorage.highScore || 0;
         } else {
             // initial setup
             for (let i = 0; i < boardSize * boardSize; i++) {
@@ -64,8 +73,12 @@
 
     function newGame() {
         id = 0;
+        gameOver = false;
+        newGameBtn1.blur();
+        newGameBtn2.blur();
         cells.forEach((cell) => (cell.tile = null));
         tiles = {};
+        tiles = tiles;
         cells = cells;
         // set timeout for re-render create tile
         tiles[id] = genTile();
@@ -77,10 +90,6 @@
     }
 
     function moveTiles(e) {
-        if (!myWindow) {
-            myWindow = e.target;
-        }
-
         console.log(e.keyCode);
         switch (e.keyCode) {
             // move left
@@ -133,7 +142,6 @@
     }
 
     function moveSuccess() {
-        console.log("moveSuccess");
         tiles[id] = genTile();
         tiles = tiles;
         cells = cells;
@@ -215,6 +223,8 @@
                         tile.mergeStatus = true;
                         tile.prevId = prevTile.id;
                         tile.value *= 2;
+                        score += tile.value;
+                        plusScore = tile.value;
                         arr[i][prev].tile = { ...tile };
                         arr[i][j].tile = null;
                         // set cell
@@ -296,7 +306,6 @@
             !checkMoveDown()
         ) {
             gameOver = true;
-            alert("game over");
             localStorage.removeItem("id", id);
             localStorage.removeItem("cells", JSON.stringify(cells));
             localStorage.removeItem("tiles", JSON.stringify(tiles));
@@ -324,21 +333,20 @@
         console.log("transition end");
         if (tile.mergeStatus) {
             tile.merge = true;
-            console.log(tile);
+            console.log("merge", tile.merge);
             tile.mergeStatus = false;
             delete tiles[tile.prevId];
             delete tile.prevId;
-        } else {
-            tile.merge = false;
+            tiles = tiles;
         }
 
         if (!keyBoardStatus) {
             // add keyup after transition
             moveSuccess();
             keyBoardStatus = true;
+        } else {
+            localStorage.setItem("tiles", JSON.stringify(tiles));
         }
-        tiles = tiles;
-        localStorage.setItem("tiles", JSON.stringify(tiles));
     }
     function handleAnimationEnd(tile) {
         console.log("animation end");
@@ -360,30 +368,34 @@
 
 <svelte:window on:keyup|once={moveTiles} />
 <section>
+    <Score {score} {highScore} {plusScore} />
     <div class="text-right">
-        <button on:click={newGame}>new game</button>
+        <button on:click={newGame} bind:this={newGameBtn1}>new game</button>
     </div>
-    <div
-        class="game-board"
-        style="--boardSize:{boardSize};--gap: 1rem;--padding: 1rem;"
-    >
-        {#each cells as cell (Symbol())}
-            <Cell />
-        {/each}
-        {#each Object.values(tiles) as tile (tile.id)}
-            <Tile
-                id={tile.id}
-                x={tile.x}
-                y={tile.y}
-                value={tile.value}
-                merge={tile.merge}
-                on:transitionend={() => handleTransitionEnd(tile)}
-                on:animationend={() => handleAnimationEnd(tile)}
-            />
-        {/each}
-        <div class="game-over" style="display:{gameOver ? 'flex' : 'none'};">
+    <div class="game-board-wrapper">
+        <div
+            class="game-board"
+            style="--boardSize:{boardSize};--gap: 1rem;--padding: 1rem;"
+        >
+            {#each cells as cell (Symbol())}
+                <Cell />
+            {/each}
+            {#each Object.values(tiles) as tile (tile.id)}
+                <Tile
+                    id={tile.id}
+                    x={tile.x}
+                    y={tile.y}
+                    value={tile.value}
+                    merge={tile.merge}
+                    mergeStatus={tile.mergeStatus}
+                    on:transitionend={() => handleTransitionEnd(tile)}
+                    on:animationend={() => handleAnimationEnd(tile)}
+                />
+            {/each}
+        </div>
+        <div class="game-over" class:active={gameOver}>
             <p>Game Over</p>
-            <button on:click={newGame}>new game</button>
+            <button on:click={newGame} bind:this={newGameBtn2}>new game</button>
         </div>
     </div>
 </section>
@@ -394,6 +406,9 @@
     }
     .text-right {
         text-align: right;
+    }
+    .game-board-wrapper {
+        position: relative;
     }
     .game-board {
         width: 60vw;
@@ -408,9 +423,12 @@
         padding: var(--padding);
         gap: var(--gap);
         position: relative;
+        z-index: 2;
     }
     .game-over {
         position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
         flex-direction: column;
@@ -418,9 +436,15 @@
         align-items: center;
         background-color: rgba(0, 0, 0, 0.6);
         border-radius: 1rem;
-        font-size: 5vw;
+        font-size: clamp(2rem, 7vw, 4rem);
         color: white;
-        opacity: 1;
+        display: flex;
+        opacity: 0;
         transition: all 1s;
+        z-index: -1;
+    }
+    .active {
+        opacity: 1;
+        z-index: 3;
     }
 </style>
