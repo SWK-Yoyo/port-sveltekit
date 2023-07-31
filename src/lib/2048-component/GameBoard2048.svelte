@@ -3,7 +3,6 @@
     import Cell from "$lib/2048-component/Cell.svelte";
     import Score from "$lib/2048-component/Score.svelte";
     import { onMount } from "svelte";
-    import { escape } from "svelte/internal";
 
     let myWindow;
     let keyBoardStatus = true;
@@ -18,14 +17,15 @@
     let score = 0;
     let highScore = 0;
     let plusScore = 0;
+    let plusScoreTotal = 0;
     onMount(() => {
         myWindow = window;
         if (localStorage.cells) {
             id = localStorage.id;
             cells = JSON.parse(localStorage.cells);
             tiles = JSON.parse(localStorage.tiles);
-            score = localStorage.score || 0;
-            highScore = localStorage.highScore || 0;
+            score = parseInt(localStorage.score) || 0;
+            highScore = parseInt(localStorage.highScore) || 0;
         } else {
             // initial setup
             for (let i = 0; i < boardSize * boardSize; i++) {
@@ -73,6 +73,8 @@
 
     function newGame() {
         id = 0;
+        score = 0;
+
         gameOver = false;
         newGameBtn1.blur();
         newGameBtn2.blur();
@@ -84,6 +86,7 @@
         tiles[id] = genTile();
         tiles[id] = genTile();
         tiles = tiles;
+        localStorage.setItem("score", score);
         localStorage.setItem("id", id);
         localStorage.setItem("cells", JSON.stringify(cells));
         localStorage.setItem("tiles", JSON.stringify(tiles));
@@ -223,8 +226,7 @@
                         tile.mergeStatus = true;
                         tile.prevId = prevTile.id;
                         tile.value *= 2;
-                        score += tile.value;
-                        plusScore = tile.value;
+                        setScore(score, tile.value);
                         arr[i][prev].tile = { ...tile };
                         arr[i][j].tile = null;
                         // set cell
@@ -262,6 +264,8 @@
                 }
             }
         }
+        plusScore = plusScoreTotal;
+        plusScoreTotal = 0;
         cells = cells;
         tiles = tiles;
         return moveStatus;
@@ -364,6 +368,16 @@
             tiles = tiles;
         }
     }
+
+    function setScore(sc, plus) {
+        score = Math.floor(sc + plus);
+        plusScoreTotal += plus;
+        if (highScore < score) {
+            highScore = score;
+            localStorage.setItem("highScore", score);
+        }
+        localStorage.setItem("score", score);
+    }
 </script>
 
 <svelte:window on:keyup|once={moveTiles} />
@@ -373,10 +387,7 @@
         <button on:click={newGame} bind:this={newGameBtn1}>new game</button>
     </div>
     <div class="game-board-wrapper">
-        <div
-            class="game-board"
-            style="--boardSize:{boardSize};--gap: 1rem;--padding: 1rem;"
-        >
+        <div class="game-board" style="--boardSize:{boardSize};">
             {#each cells as cell (Symbol())}
                 <Cell />
             {/each}
@@ -401,6 +412,16 @@
 </section>
 
 <style>
+    :root {
+        --gap: 0.5rem;
+        --padding: 0.5rem;
+    }
+    @media (min-width: 426px) {
+        :root {
+            --gap: 1rem;
+            --padding: 1rem;
+        }
+    }
     button {
         margin-bottom: 1rem;
     }
@@ -411,8 +432,8 @@
         position: relative;
     }
     .game-board {
-        width: 60vw;
-        height: 60vw;
+        width: 80vw;
+        height: 80vw;
         max-width: 500px;
         max-height: 500px;
         background-color: rgb(255, 161, 161);

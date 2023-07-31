@@ -1,21 +1,32 @@
 <script>
-    import { fly } from "svelte/transition";
+    import { fly, scale } from "svelte/transition";
     export let score = 0;
     export let highScore = 0;
     export let plusScore;
 </script>
 
 <div class="score-wrapper">
-    <div class="high-score">
+    <div>
         <p>High Score</p>
         {highScore > score ? highScore : score}
     </div>
-    <div class="score">
+    <div>
         <p>Score</p>
-        {score}
-        {#if plusScore}
-            <span out:fly={{ y: -200, duration: 300 }}>{plusScore}</span>
-        {/if}
+        <span class="score">
+            {score}
+            {#key plusScore}
+                {#if plusScore}
+                    <div
+                        class="plus-score"
+                        in:scale={{ duration: 150, start: 0.6 }}
+                        out:fly={{ y: -20, duration: 250 }}
+                        on:introend={() => (plusScore = 0)}
+                    >
+                        +{plusScore}
+                    </div>
+                {/if}
+            {/key}
+        </span>
     </div>
 </div>
 
@@ -25,16 +36,27 @@
         gap: 1rem;
         text-align: center;
     }
-    .score-wrapper div {
+    .score-wrapper > div {
         min-width: 100px;
         background-color: brown;
-        padding: 0.5rem;
+        padding: 0.5rem 1rem;
         color: white;
         border-radius: 0.5rem;
-        font-size: 1.5rem;
+        font-size: clamp(1rem, 2vw, 1.5rem);
+        position: relative;
+    }
+    .score {
+        position: relative;
     }
     p {
-        font-size: 0.5rem;
-        margin-bottom: 0.7rem;
+        font-size: clamp(0.5rem, 2vw, 1rem);
+        margin-bottom: clamp(0.5rem, 2vw, 1rem);
+    }
+    .plus-score {
+        position: absolute;
+        font-size: clamp(0.7rem, 1vw, 1rem);
+        top: -25%;
+        right: -50%;
+        color: #ccc;
     }
 </style>

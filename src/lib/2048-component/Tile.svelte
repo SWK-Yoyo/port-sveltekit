@@ -99,7 +99,7 @@
         width: 50px;
         height: 50px;
         border-radius: 0.5rem;
-        font-size: clamp(1rem , 4vw , 3rem);
+        font-size: clamp(1rem, 4vw, 3rem);
         top: calc(
             var(--y) * (100% / var(--boardSize) - (var(--gap) * 0.25)) +
                 var(--gap)
@@ -108,8 +108,8 @@
             var(--x) * (100% / var(--boardSize) - (var(--gap) * 0.25)) +
                 var(--gap)
         );
-        width: calc((100% / var(--boardSize)) - (var(--gap) + 0.25rem));
-        height: calc((100% / var(--boardSize)) - (var(--gap) + 0.25rem));
+        width: calc((100% / var(--boardSize)) - (var(--gap) * 1.25));
+        height: calc((100% / var(--boardSize)) - (var(--gap) * 1.25));
         transition: all 100ms;
         z-index: 2;
     }
@@ -121,9 +121,8 @@
         z-index: 3;
     }
     @keyframes merge {
-        0%{
-            
-            transform: scale(.95);
+        0% {
+            transform: scale(0.95);
         }
         50% {
             transform: scale(1.1);
