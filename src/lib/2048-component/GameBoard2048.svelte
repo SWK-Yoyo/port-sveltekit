@@ -2,6 +2,7 @@
     import Tile from "$lib/2048-component/Tile.svelte";
     import Cell from "$lib/2048-component/Cell.svelte";
     import Score from "$lib/2048-component/Score.svelte";
+    import CardDialog from "$lib/helper-component/CardDialog.svelte";
     import { onMount } from "svelte";
 
     let myWindow;
@@ -378,7 +379,7 @@
         }
         localStorage.setItem("score", score);
     }
-</script>
+</script>ใ
 
 <svelte:window on:keyup|once={moveTiles} />
 <section>

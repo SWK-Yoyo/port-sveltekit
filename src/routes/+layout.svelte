@@ -1,16 +1,18 @@
 <script>
     /** @type {import('./$types').LayoutData} */
-    export let data;
+    import Login, { showLoginModal } from "$lib/login-component/Login.svelte";
 </script>
 
 <header>
     <p>logo</p>
     <p>logo</p>
-    <button>Login</button>
+    <button on:click={showLoginModal}>Login</button>
 </header>
+
 <section>
     <slot />
 </section>
+<Login />
 
 <style>
     header {
