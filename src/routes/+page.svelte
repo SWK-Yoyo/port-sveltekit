@@ -1,6 +1,5 @@
 <script>
-    import './style.css'
-    import Swal from "sweetalert2";
+        import Swal from "sweetalert2";
     import { fly } from "svelte/transition";
     let passwordType = true;
     let params = {

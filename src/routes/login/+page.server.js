@@ -10,14 +10,8 @@ export async function load() {
 
 export const actions = {
     default: async ({ request }) => {
-        // const data = await request.formDate();
-        // const params = {
-        //     username: data.username.trim(),
-        //     password: bcrypt.hash(data.password.trim(), 10)
-        // }
-        // const usersCollection = db.collection('users')
-        // const user = usersCollection.findOne({ username: params.username });
-        // throw error(500, 'test')
+        const data = await request.formData();
+       
 
     }
 }

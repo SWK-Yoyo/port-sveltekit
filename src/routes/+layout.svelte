@@ -1,5 +1,6 @@
 <script>
     /** @type {import('./$types').LayoutData} */
+    import './style.css'
     import Login, { showLoginModal } from "$lib/login-component/Login.svelte";
 </script>
 

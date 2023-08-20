@@ -24,3 +24,11 @@ button {
     cursor: pointer;
     font-family: "Rubik", sans-serif;
 }
+/* invalid zone */
+input.invalid{
+    border-color: red;
+}
+.invalid-text{
+    color: red;
+    font-size: .8rem;
+}

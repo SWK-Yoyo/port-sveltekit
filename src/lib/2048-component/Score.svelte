@@ -7,7 +7,7 @@
 
 <div class="score-wrapper">
     <div>
-        <p>High Score</p>
+        <p>High Score</p>g
         {highScore > score ? highScore : score}
     </div>
     <div>
