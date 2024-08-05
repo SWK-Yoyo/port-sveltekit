@@ -9,3 +9,12 @@
 <main>
     <slot></slot>
 </main>
+
+
+<style> 
+    main{
+        max-width: 1500px;
+        margin:auto;
+        padding: 5rem;
+    }
+</style>
