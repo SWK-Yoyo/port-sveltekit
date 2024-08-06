@@ -12,9 +12,12 @@
 
 
 <style> 
+    main{ 
+        padding: 2rem;
+    }
     main{
         max-width: 1500px;
         margin:auto;
-        padding: 5rem;
+        /* padding: 5rem; */
     }
 </style>

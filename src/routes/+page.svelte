@@ -1,24 +1,22 @@
 <section>
-    <!-- <h1>Siwakorn Kornnanun</h1>
+    <h1>Siwakorn Kornnanun</h1>
     <h2>Web developer</h2>
     <p class="mt-3">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ab commodi
-        necessitatibus hic cupiditate exercitationem saepe, perspiciatis
-        pariatur? Repellendus amet molestiae omnis, ullam quo animi beatae?
-    </p> -->
+        Welcome to my site!. This website is for looking my job and test my skill. build from css scsdflm
+    </p>
 </section>
 
 <style>
     h1,
     h2 {
-        font-size: 4rem;
+        font-size: var(--h1);
         font-weight: 400;
     }
     h2 { 
-        font-size: 3rem;
+        font-size: var(--h2);
     }
     p {
-        font-size: 2rem;
+        font-size: var(--h3);
         font-weight: 300;
     }
 </style>
