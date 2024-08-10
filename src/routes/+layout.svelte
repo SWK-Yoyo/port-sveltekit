@@ -1,6 +1,6 @@
 <script>
-    import Header from "../lib/Header.svelte";
-    import '../app.css'
+    import Header from "$lib/Header.svelte";
+    import "../app.css";
 </script>
 
 <section>
@@ -10,14 +10,13 @@
     <slot></slot>
 </main>
 
-
-<style> 
-    main{ 
-        padding: 2rem;
+<style>
+    main {
+        padding: 1rem;
     }
-    main{
+    main {
         max-width: 1500px;
-        margin:auto;
+        margin: auto;
         /* padding: 5rem; */
     }
 </style>
