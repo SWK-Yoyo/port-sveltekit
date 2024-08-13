@@ -1,8 +1,9 @@
 <script>
     import InputText from "$lib/form-component/InputText.svelte";
+    import Box from "$lib/Box.svelte";
 </script>
 
-<section class="box-bg">
+<Box>
     <h1>register</h1>
 
     <InputText name="username" placeholder="Username" pattern=""></InputText>
@@ -14,10 +15,13 @@
         <a href="/login">Back to Sign in</a>
         <button>Sign in</button>
     </div>
-</section>
+</Box>
 
 <style>
     .button-wrapper {
+        width: 100%;
         display: flex;
+        justify-content: end;
+        gap: 1rem;
     }
 </style>

@@ -1,10 +1,11 @@
 <script>
     import InputText from "$lib/form-component/InputText.svelte";
+    import Box from "../../lib/Box.svelte";
     export let data;
     console.log("data ");
 </script>
-
-<section class="box-bg">
+<div class="white-space"></div>
+<Box>
     <h1>Sign in</h1>
     <InputText
         name="username"
@@ -20,10 +21,13 @@
         <a href="/register">Not have an account</a>
         <button>Sign in</button>
     </div>
-</section>
+</Box>
 
 <style>
     .button-wrapper {
+        width: 100%;
         display: flex;
+        justify-content: end;
+        gap: 1rem;
     }
 </style>

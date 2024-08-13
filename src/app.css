@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     font-family: "Inter", sans-serif;
     padding: 0;
@@ -148,29 +150,21 @@ button.no-bg {
 .text-right {
     text-align: right;
 }
+.text-center{
+    text-align: center;
+}
 
 input {
     border: none;
     box-shadow: var(--box-shadow);
     font-size: 1rem;
     padding: .5rem;
+    width: 100%;
 }
 
 input:focus {
     border: none;
     outline: none;
-}
-
-.box-bg {
-    background-color: var(--section-color);
-    box-shadow: var(--box-shadow);
-    border-radius: 1rem;
-    padding: 1rem;
-    gap: .7rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 .button-wrapper {

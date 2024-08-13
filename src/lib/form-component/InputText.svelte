@@ -28,3 +28,10 @@
         on:change={onChange}
     />
 </div>
+
+<style>
+    div{
+        width: 100%;
+    }
+    
+</style>

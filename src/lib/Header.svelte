@@ -1,4 +1,5 @@
 <script>
+    import { navigator } from "$lib/setting.js";
     let active = false;
 
     function toggleActive() {
@@ -14,14 +15,14 @@
                     ><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path
                         fill="#ffffff"
                         d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"
-                    /></svg >
+                    /></svg
+                >
             </button>
         </section>
         <section class="menu px-5" class:active>
-            <a href="/work">Work</a>
-            <a href="/work">Work</a>
-            <a href="/work">Work</a>
-            <a href="/work">Work</a>
+            {#each $navigator as nav (nav._id)}
+                <a href={nav.path}>{nav.name}</a>
+            {/each}
         </section>
         <section class="">
             <a href="/login">Sign in</a>
@@ -90,6 +91,9 @@
             overflow-x: auto;
             left: unset;
             display: flex;
+            z-index: 1;
+            top: unset;
+            max-width: unset;
         }
         .mobile-menu {
             display: none;

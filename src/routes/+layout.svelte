@@ -1,6 +1,7 @@
 <script>
     import Header from "$lib/Header.svelte";
     import "../app.css";
+    export let data;
 </script>
 
 <section>
