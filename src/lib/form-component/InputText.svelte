@@ -3,11 +3,11 @@
     export let placeholder;
     export let errorText;
     export let pattern;
-
+    
     let error = false;
 
-    function onError(e) {
-        e.preventDefault();
+    function onInvalid(e) {
+        console.log("asd")
         error = true;
     }
     function onChange(e) {
@@ -24,14 +24,13 @@
         {name}
         {placeholder}
         {pattern}
-        on:error={onError}
+        on:invalid={onInvalid}
         on:change={onChange}
     />
 </div>
 
 <style>
-    div{
+    div {
         width: 100%;
     }
-    
 </style>
