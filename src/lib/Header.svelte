@@ -7,7 +7,7 @@
     }
 </script>
 
-<header class="p-3">
+<header class="p-2">
     <nav>
         <section class="mobile-menu">
             <button on:click={toggleActive} class="no-bg">
@@ -36,6 +36,7 @@
         background-color: var(--primary-color);
         position: relative;
         z-index: 2;
+        padding: var(--space-2);
     }
     a {
         font-size: 1.3rem;
@@ -97,6 +98,9 @@
         }
         .mobile-menu {
             display: none;
+        }
+        header{ 
+            padding: var(--space-3);
         }
     }
 </style>
