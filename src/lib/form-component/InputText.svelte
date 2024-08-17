@@ -1,13 +1,15 @@
 <script>
+    import { regexToPattern } from "../form";
+
     export let name;
     export let placeholder;
     export let errorText;
     export let pattern;
-    
+
     let error = false;
 
     function onInvalid(e) {
-        console.log("asd")
+        console.log("asd");
         error = true;
     }
     function onChange(e) {
@@ -23,7 +25,7 @@
         type="text"
         {name}
         {placeholder}
-        {pattern}
+        pattern={regexToPattern(pattern)}
         on:invalid={onInvalid}
         on:change={onChange}
     />

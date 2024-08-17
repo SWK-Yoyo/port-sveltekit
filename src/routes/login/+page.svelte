@@ -1,12 +1,22 @@
 <script>
-    import InputText from "$lib/form-component/InputText.svelte";
-    import { usersPattern } from "$lib/form.js";
+    import InputText from "../../lib/form-component/InputText.svelte";
+    import { submitForm, usersPattern } from "../../lib/form.js";
     import { PUBLIC_API_URL } from "$env/static/public";
+
     import Box from "../../lib/Box.svelte";
     export let data;
+    let username;
+    let password;
+
     function onSubmit(e) {
         e.preventDefault();
+        console.log(username);
+        console.log(password);
+        submitForm(e, { username, password });
     }
+
+    $: console.log("username", username);
+    $: console.log("password", password);
 </script>
 
 <div class="white-space"></div>
@@ -18,11 +28,13 @@
             name="username"
             placeholder="Username"
             errorText="test tes"
+            required={true}
         ></InputText>
         <InputText
             pattern={$usersPattern.password.regex}
             name="password"
             placeholder="Password"
+            required={true}
         ></InputText>
         <div class="button-wrapper">
             <a href="/register">Not have an account</a>
