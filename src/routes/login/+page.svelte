@@ -5,18 +5,15 @@
 
     import Box from "../../lib/Box.svelte";
     export let data;
-    let username;
-    let password;
+    let params = {
+        username: "",
+        password: "",
+    };
 
     function onSubmit(e) {
         e.preventDefault();
-        console.log(username);
-        console.log(password);
-        submitForm(e, { username, password });
+        submitForm(e, { params }, usersPattern);
     }
-
-    $: console.log("username", username);
-    $: console.log("password", password);
 </script>
 
 <div class="white-space"></div>
@@ -29,12 +26,14 @@
             placeholder="Username"
             errorText="test tes"
             required={true}
+            bind:value={params.username}
         ></InputText>
         <InputText
             pattern={$usersPattern.password.regex}
             name="password"
             placeholder="Password"
             required={true}
+            bind:value={params.password}
         ></InputText>
         <div class="button-wrapper">
             <a href="/register">Not have an account</a>
