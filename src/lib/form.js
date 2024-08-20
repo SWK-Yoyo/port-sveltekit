@@ -18,6 +18,20 @@ export function regexToPattern(regex) {
 
 export async function submitForm(event, params) {
     console.log("event", event)
-    console.log(event.target)
-    const url = event
+    const action = event.srcElement.action
+    const method = event.srcElement.method
+    const response = await fetch(action, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(params)
+    })
+    const res = await response.json()
+    console.log("res", res)
+    return {
+        status: response.ok,
+        message: res.message,
+        data: res.data || []
+    }
 }
