@@ -20,14 +20,21 @@
         form.status = true;
         e.preventDefault();
         let response = await submitForm(e, params);
-        form.status = response.status;
-        form.message = response.message;
-        form = form;
+        if (response) {
+            form.status = response.status;
+            form.message = response.message;
+            form = form;
+        }
     }
 </script>
 
 <div class="white-space"></div>
-<form action="{PUBLIC_API_URL}/login" method="post" on:submit={onSubmit}>
+<form
+    action="{PUBLIC_API_URL}/login"
+    method="post"
+    on:submit={onSubmit}
+    novalidate
+>
     <Box>
         <h1>Sign in</h1>
         <BoxError show={!form.status}>{form.message}</BoxError>

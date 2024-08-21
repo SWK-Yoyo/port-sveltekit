@@ -31,7 +31,7 @@
             type="text"
             {name}
             {placeholder}
-            pattern={regexToPattern(pattern)}
+            {pattern}
             on:invalid={onInvalid}
             on:change={onChange}
             bind:value
@@ -42,7 +42,7 @@
             type="password"
             {name}
             {placeholder}
-            pattern={regexToPattern(pattern)}
+            {pattern}
             on:invalid={onInvalid}
             on:change={onChange}
             bind:value
