@@ -17,48 +17,54 @@ export function regexToPattern(regex) {
 }
 
 export async function submitForm(event, params) {
-    console.log("event", event)
     const action = event.srcElement.action
     const method = event.srcElement.method
     const formStatus = validateForm(event.target);
-    console.log("formStatus", formStatus)
-    // return false
-    // const response = await fetch(action, {
-    //     method: method,
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(params)
-    // })
-    // const res = await response.json()
-    // console.log("res", res)
-    // return {
-    //     status: response.ok,
-    //     message: res.message,
-    //     data: res.data || []
-    // }
+    if (!formStatus) {
+        return false
+    }
+    const response = await fetch(action, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(params)
+    })
+    const res = await response.json()
+    console.log("res", res)
+    return {
+        status: response.ok,
+        message: res.message,
+        data: res.data || []
+    }
 }
 
 function validateForm(inputs) {
     let formStatus = true;
     let focusInput
-    console.log(inputs)
     for (const input of inputs) {
         switch (input.type) {
-            case 'text' || 'password':
+            case 'text':
+            case 'password':
                 const pattern = input.getAttribute('pattern')
-                console.log("input ", input)
-                console.log("pattern", pattern)
                 if (new RegExp(pattern).test(input.value)) {
                     continue
                 }
                 if (!focusInput) {
                     focusInput = input
                 }
-                // input.reportValidity()
+                forceInvalid(input)
                 formStatus = false
                 break;
         }
     }
+    if (focusInput) {
+        focusInput.focus()
+    }
     return formStatus
+}
+
+function forceInvalid(input) {
+    input.setCustomValidity('This is a forced invalid state.');
+    input.reportValidity(); // This will trigger the validation message
 }

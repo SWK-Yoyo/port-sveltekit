@@ -12,8 +12,14 @@
         message: "",
     };
     let params = {
-        username: "",
-        password: "",
+        username: {
+            value: "",
+            status: true,
+        },
+        password: {
+            value: "",
+            status: true,
+        },
     };
 
     async function onSubmit(e) {
@@ -44,7 +50,7 @@
             placeholder="Username"
             errorText="test tes"
             required={true}
-            bind:value={params.username}
+            bind:value={params.username.value}
         ></InputText>
         <InputText
             type="password"
@@ -52,8 +58,8 @@
             name="password"
             placeholder="Password"
             required={true}
-            bind:value={params.password}
-        ></InputText>
+            bind:value={params.password.value}
+            ></InputText>
         <div class="button-wrapper">
             <a href="/register">Not have an account</a>
             <button>Sign in</button>
