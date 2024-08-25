@@ -1,7 +1,9 @@
 <script>
     import { navigator } from "$lib/setting.js";
+    import { meSotre } from "./me.js";
+    import { get } from "svelte/store";
     let active = false;
-
+    const me = get(meSotre);
     function toggleActive() {
         active = !active;
     }
@@ -25,7 +27,11 @@
             {/each}
         </section>
         <section class="">
-            <a href="/login">Sign in</a>
+            {#if me.name}
+                <p>Welcome {me.name}</p>
+            {:else}
+                <a href="/login">Sign in</a>
+            {/if}
         </section>
     </nav>
 </header>
@@ -99,7 +105,7 @@
         .mobile-menu {
             display: none;
         }
-        header{ 
+        header {
             padding: var(--space-3);
         }
     }

@@ -2,9 +2,11 @@
     import InputText from "../../lib/form-component/InputText.svelte";
     import { submitForm, usersPattern } from "../../lib/form.js";
     import { PUBLIC_API_URL } from "$env/static/public";
-    import { user } from "../../lib/user.js";
+    import { token, refreshToken } from "../../lib/auth.js";
+    import { meSotre } from "../../lib/me.js";
     import Box from "../../lib/Box.svelte";
     import BoxError from "../../lib/BoxError.svelte";
+    import { setContext } from "svelte";
 
     let error = {
         status: false,
@@ -28,8 +30,16 @@
             error = error;
             return;
         }
-
-        window.location.href = "/";
+        console.log("response", response);
+        token.set(response.data.token);
+        refreshToken.set(response.data.refreshToken);
+        meSotre.update((me) => {
+            me = {
+                name: response.data.user.name,
+                role: response.data.user.role,
+            };
+        });
+        // window.location.href = "/";
     }
 </script>
 
