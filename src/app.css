@@ -30,6 +30,7 @@
     --h5: .8rem;
     --h6: .6rem;
     --box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    --image-default: #6B6B6B;
 }
 
 .inter-400 {
@@ -150,7 +151,8 @@ button.no-bg {
 .text-right {
     text-align: right;
 }
-.text-center{
+
+.text-center {
     text-align: center;
 }
 

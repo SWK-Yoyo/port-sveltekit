@@ -1,6 +1,6 @@
 <script>
-    import { navigator } from "$lib/setting.js";
-    import { meSotre } from "./me.js";
+    import { navigator } from "$lib/storage/setting.js";
+    import { meSotre } from "./storage/me.js";
     import { get } from "svelte/store";
     let active = false;
     const me = get(meSotre);
